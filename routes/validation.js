@@ -1,6 +1,15 @@
 // Validation
 const Joi = require('@hapi/joi');
 
+// only email validation
+const emailValidate = (body) => {
+    const schema = Joi.object({
+        email: Joi.string().required().max(255).email(),
+        OTP: Joi.string().required(),
+    });
+    return schema.validate(body);
+}
+
 // register validation
 const registerValidate = (body) => {
     const schema = Joi.object({
@@ -22,3 +31,4 @@ const loginValidate = (body) => {
 
 module.exports.registerValidate = registerValidate;
 module.exports.loginValidate = loginValidate;
+module.exports.emailValidate = emailValidate;
