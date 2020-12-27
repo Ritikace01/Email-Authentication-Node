@@ -4,6 +4,7 @@ const router = require('express').Router();
 const { registerValidate, loginValidate } = require('./validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 router.get('/', (req, res) => {
     res.send("Welcome to backend");
@@ -37,6 +38,50 @@ router.post('/signUp', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
+
+    // output message for mail
+    const output = `
+    <p>You have a contact reuqest</p>
+    <p>Contact Details are : </p>
+    <ul>
+    <li>First Name : ${req.body.firstName}</li>
+    <li>Last Name : ${req.body.lastName}</li>
+    <li>Email : ${req.body.email}</li>
+    <li>Password : ${req.body.password}</li>
+    </ul>
+    `;
+
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: 'ritikaperformer04@gmail.com', // generated ethereal user
+            pass: process.env.PASSWORD, // generated ethereal password
+        },
+        tls: {
+            rejectUnauthorized: false,
+        }
+    });
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+        from: '"Ritika Singh 👻" <ritikaperformer04@gmail.com>', // sender address
+        to: req.body.email, // list of receivers
+        subject: "Team MyWay", // Subject line
+        text: "Hello world?", // plain text body
+        html: output, // html body
+    });
+
+    console.log("Message sent: %s", info.messageId);
+    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+    // Preview only available when sending through an Ethereal account
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+
+    res.render('contact', { msg: 'EMAIL HAS BEEN SENT' });
 })
 
 router.post('/login', async (req, res) => {
