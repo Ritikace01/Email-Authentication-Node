@@ -4,7 +4,7 @@ const router = require('express').Router();
 const { registerValidate, loginValidate } = require('./validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+var nodemailer = require('nodemailer');
 
 router.get('/', (req, res) => {
     res.send("Welcome to backend");
@@ -52,36 +52,28 @@ router.post('/signUp', async (req, res) => {
     `;
 
     // create reusable transporter object using the default SMTP transport
-    let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false, // true for 465, false for other ports
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
         auth: {
-            user: 'ritikaperformer04@gmail.com', // generated ethereal user
-            pass: process.env.PASSWORD, // generated ethereal password
-        },
-        tls: {
-            rejectUnauthorized: false,
+            user: 'ritikaperformer04@gmail.com',
+            pass: 'sunrise@5469'
         }
     });
 
-    // send mail with defined transport object
-    let info = await transporter.sendMail({
-        from: '"Ritika Singh 👻" <ritikaperformer04@gmail.com>', // sender address
-        to: req.body.email, // list of receivers
-        subject: "Team MyWay", // Subject line
-        text: "Hello world?", // plain text body
-        html: output, // html body
+    var mailOptions = {
+        from: 'ritikaperformer04@gmail.com',
+        to: '181210042@nitdelhi.ac.in',
+        subject: 'Team MyWay',
+        text: output,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
     });
-
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-    // Preview only available when sending through an Ethereal account
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-    res.render('contact', { msg: 'EMAIL HAS BEEN SENT' });
 })
 
 router.post('/login', async (req, res) => {
