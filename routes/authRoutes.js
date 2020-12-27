@@ -5,6 +5,10 @@ const { registerValidate, loginValidate } = require('./validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+router.get('/', (req, res) => {
+    res.send("Welcome to backend");
+})
+
 router.post('/signUp', async (req, res) => {
     // validate data before making user
     const { error } = registerValidate(req.body);
