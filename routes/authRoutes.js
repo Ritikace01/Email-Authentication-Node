@@ -12,14 +12,14 @@ router.get('/', (req, res) => {
 router.post('/signUp', async (req, res) => {
     // validate data before making user
     const { error } = registerValidate(req.body);
-    console.log(error.details[0].message);
+    // console.log(error.details[0].message);
     if (error) return res.status(400).send(error.details[0].message);
 
     //check if user is already in db
     const emailExists = await User.findOne({ email: req.body.email });
     if (emailExists) return res.status(400).send("Email already exists");
 
-    // hash the password
+    // hash the password 
     const salt = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(req.body.password, salt);
 
@@ -33,7 +33,7 @@ router.post('/signUp', async (req, res) => {
     // catch error
     try {
         const savedUser = await user.save();
-        res.send({ user: user._id });
+        res.send(savedUser);
     } catch (err) {
         res.status(400).send(err);
     }
@@ -58,6 +58,17 @@ router.post('/login', async (req, res) => {
 router.post('/forgotPassword', (req, res) => {
     const { error } = loginValidate(req.body);
     if (error) return res.status(400).send(error.details[0].mes)
+})
+
+router.get('/:id', (req, res) => {
+    User.findById(req.params.id)
+        .then(doc => {
+            if (!doc) { res.status(400).send("Can't find user"); }
+            return res.status(200).json(doc);
+        })
+        .catch(err => {
+            console.log(err);
+        });
 })
 
 module.exports = router;
