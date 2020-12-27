@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
+const compression = require('compression');
 // import routes
 const authRoute = require('./routes/authRoutes');
 const postRoute = require('./routes/privateRoutes/post');
@@ -20,6 +22,8 @@ mongoose.connect(process.env.DB_CONNECT,
     });
 
 // middleware
+app.use(helmet());
+app.use(compression());
 app.use(express.json());
 app.use(cors({
     origin: ["http://localhost:3000"],
