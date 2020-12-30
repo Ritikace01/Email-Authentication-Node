@@ -109,7 +109,7 @@ router.post('/forgotPassword', async (req, res) => {
 
     // create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-    res.header('reset-token', token).send(token);
+    // await res.header('reset-token', token).send(token);
 
     // output message for mail 
     const output = `Hello, use the following link to reset password,
@@ -140,6 +140,28 @@ router.post('/forgotPassword', async (req, res) => {
             res.send('Email sent: ' + info.response);
         }
     });
+})
+
+router.put('/resetPassword/:id', async (req, res) => {
+    // first validate the req body
+    const { error } = passwordValidate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    // find the user with user id = req.params.id
+    const user = await User.findById(req.params.id);
+    console.log("User found", user);
+
+    // hash the password1 field
+    const salt = await bcrypt.genSalt(10);
+    const hashedPass = await bcrypt.hash(req.body.password1, salt);
+    // update it in the user's password field - in DB
+    user.password = hashedPass;
+    try {
+        const savedUser = await user.save();
+        res.send(savedUser);
+    } catch (err) {
+        res.status(400).send(err);
+    }
 })
 
 router.get('/:id', (req, res) => {
