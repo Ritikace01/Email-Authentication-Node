@@ -116,7 +116,7 @@ router.post('/forgotPassword', async (req, res) => {
 
     // output message for mail 
     const output = `Hello, use the following link to reset password,
-    https://pensive-hugle-7c3a26.netlify.app/resetPassword/${token}
+    https://nifty-kalam-b4d153.netlify.app/resetPassword/${token}
                     thank you for choosing MyWays!`;
 
     // need to send message to the user with a link
