@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const User = require('../model/User');
 const router = require('express').Router();
-const { registerValidate, loginValidate, emailValidate } = require('./validation');
+const { registerValidate, loginValidate, emailValidate, forgotValidate } = require('./validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
@@ -80,39 +80,6 @@ router.post('/signUp', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
-
-    // // output message for mail
-    // const output = `
-    // You have a contact reuqest. Contact Details are : 
-    // First Name : ${req.body.firstName}
-    // Last Name : ${req.body.lastName}
-    // Email : ${req.body.email}
-    // Password : ${req.body.password}
-    // `;
-
-    // // create reusable transporter object using the default SMTP transport
-    // var transporter = nodemailer.createTransport({
-    //     service: 'gmail',
-    //     auth: {
-    //         user: 'ritikaperformer04@gmail.com',
-    //         pass: `${process.env.PASSWORD}`
-    //     }
-    // });
-
-    // var mailOptions = {
-    //     from: 'ritikaperformer04@gmail.com',
-    //     to: `${req.body.email}`,
-    //     subject: 'Team MyWay',
-    //     text: output,
-    // };
-
-    // transporter.sendMail(mailOptions, function (error, info) {
-    //     if (error) {
-    //         console.log(error);
-    //     } else {
-    //         console.log('Email sent: ' + info.response);
-    //     }
-    // });
 })
 
 router.post('/login', async (req, res) => {
@@ -120,7 +87,7 @@ router.post('/login', async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
 
     const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(400).send("Email doesn't exists");
+    if (!user) return res.status(400).send("User doesn't exist");
 
     const checkPass = await bcrypt.compare(req.body.password, user.password);
     if (!checkPass) return res.status(400).send("Email or Password is wrong");
@@ -131,9 +98,14 @@ router.post('/login', async (req, res) => {
     //res.send("Logged In");
 })
 
-router.post('/forgotPassword', (req, res) => {
-    const { error } = loginValidate(req.body);
-    if (error) return res.status(400).send(error.details[0].mes)
+router.post('/forgotPassword', async (req, res) => {
+    const { error } = forgotValidate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(400).send("User doesn't exist");
+
+    res.send(user);
 })
 
 router.get('/:id', (req, res) => {

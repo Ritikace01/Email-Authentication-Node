@@ -29,6 +29,14 @@ const loginValidate = (body) => {
     return schema.validate(body);
 }
 
+const forgotValidate = (body) => {
+    const schema = Joi.object({
+        email: Joi.string().required().email(),
+    });
+    return schema.validate(body);
+}
+
 module.exports.registerValidate = registerValidate;
 module.exports.loginValidate = loginValidate;
 module.exports.emailValidate = emailValidate;
+module.exports.forgotValidate = forgotValidate;
