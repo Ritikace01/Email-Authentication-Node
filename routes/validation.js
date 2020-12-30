@@ -36,7 +36,16 @@ const forgotValidate = (body) => {
     return schema.validate(body);
 }
 
+const passwordValidate = (body) => {
+    const schema = Joi.object({
+        password1: Joi.string().required().min(6).max(20),
+        password2: Joi.string().valid(Joi.ref('password1')).required(),
+    });
+    return schema.validate(body);
+}
+
 module.exports.registerValidate = registerValidate;
 module.exports.loginValidate = loginValidate;
 module.exports.emailValidate = emailValidate;
 module.exports.forgotValidate = forgotValidate;
+module.exports.passwordValidate = passwordValidate;

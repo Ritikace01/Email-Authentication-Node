@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const User = require('../model/User');
 const router = require('express').Router();
-const { registerValidate, loginValidate, emailValidate, forgotValidate } = require('./validation');
+const { registerValidate, loginValidate, emailValidate, forgotValidate, passwordValidate } = require('./validation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
@@ -106,6 +106,40 @@ router.post('/forgotPassword', async (req, res) => {
     if (!user) return res.status(400).send("User doesn't exist");
 
     res.send(user);
+
+    // create and assign a token
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    res.header('reset-token', token).send(token);
+
+    // output message for mail 
+    const output = `Hello, use the following link to reset password,
+                    http://localhost:3000/resetPassword/${token}
+                    thank you for choosing MyWays!`;
+
+    // need to send message to the user with a link
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'ritikaperformer04@gmail.com',
+            pass: `${process.env.PASSWORD}`
+        }
+    });
+
+    var mailOptions = {
+        from: 'ritikaperformer04@gmail.com',
+        to: `${req.body.email}`,
+        subject: 'Team MyWay',
+        text: output,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.send('Email sent: ' + info.response);
+        }
+    });
 })
 
 router.get('/:id', (req, res) => {
