@@ -26,7 +26,7 @@ app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://pensive-hugle-7c3a26.netlify.app"],
     credentials: true
 }));
 // route middleware
