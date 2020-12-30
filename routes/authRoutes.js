@@ -18,6 +18,9 @@ router.post('/sendOtp', (req, res) => {
     const { error } = emailValidate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
+    const emailExists = await User.findOne({ email: req.body.email });
+    if (emailExists) return res.status(400).send("Email already exists");
+
     // if the email is correct then we need to send otp on that mail
     var OTP = req.body.OTP;
 
