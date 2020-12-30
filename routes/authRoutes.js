@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 })
 
 // api to send otp to the user - take only email
-router.post('/sendOtp', (req, res) => {
+router.post('/sendOtp', async (req, res) => {
     const { error } = emailValidate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
